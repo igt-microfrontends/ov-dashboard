@@ -1,10 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { eventBus } from "./event-bus/EventBus";
 
-import { useAuth } from "remoteHostApp/useAuth";
+interface AuthState {
+    user: string | null;
+    token: string | null;
+}
 
-export const App = () => {
+const App = () => {
     const [count, setCount] = useState(0);
-    const { token, setToken } = useAuth();
+    const [authState, setAuthState] = useState<AuthState>({
+        user: null,
+        token: null,
+    });
+
+    useEffect(() => {
+        eventBus.subscribe("authStateChanged", (newAuthState: AuthState) => {
+            console.log("authStateChanged event received");
+
+            setAuthState(newAuthState);
+        });
+
+        return () => {
+            eventBus.unsubscribe("authStateChanged");
+        };
+    }, []);
+
     return (
         <div
             style={{
@@ -15,8 +35,9 @@ export const App = () => {
             <div>{count}</div>
             <button onClick={() => setCount(count + 1)}>Incrementar</button>
             <p>Holaaa!</p>
-            <div>{token}</div>
-            <button onClick={() => setToken("token remote")}>Setar token</button>
+            <div>{authState.token}</div>
         </div>
     );
 };
+
+export default App;
