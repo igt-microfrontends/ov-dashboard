@@ -1,43 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { eventBus } from "./event-bus/EventBus";
+import "chart.js/auto";
 
-interface AuthState {
-    user: string | null;
-    token: string | null;
-}
+import { Line } from "react-chartjs-2";
 
 const App = () => {
-    const [count, setCount] = useState(0);
-    const [authState, setAuthState] = useState<AuthState>({
-        user: null,
-        token: null,
-    });
-
     useEffect(() => {
-        eventBus.subscribe("authStateChanged", (newAuthState: AuthState) => {
-            console.log("authStateChanged event received");
-
-            setAuthState(newAuthState);
-        });
-
         return () => {
             eventBus.unsubscribe("authStateChanged");
         };
     }, []);
 
-    return (
-        <div
-            style={{
-                backgroundColor: "red",
-            }}
-        >
-            <div>Dashboard remoto</div>
-            <div>{count}</div>
-            <button onClick={() => setCount(count + 1)}>Incrementar</button>
-            <p>Holaaa!</p>
-            <div>{authState.token}</div>
-        </div>
-    );
+    const DATA_COUNT = 7;
+
+    const labels = Array.from({ length: DATA_COUNT }, (_, i) => i);
+    const data = {
+        labels: labels,
+        datasets: [
+            {
+                label: "Dataset 1",
+                data: [65, 59, 80, 81, 56, 55, 40],
+            },
+            {
+                label: "Dataset 2",
+                data: [28, 48, 40, 19, 86, 27, 90],
+            },
+        ],
+    };
+
+    return <Line data={data} />;
 };
 
 export default App;
